@@ -4,11 +4,10 @@ import { useTheme } from '@/context/ThemeContext';
 import { LayoutDashboard, Map, Search, Activity, User, LogOut, Sun, Moon, Plane, ListChecks, DollarSign, StickyNote, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, setCollapsed }) {
   const { logout, user } = useAuth();
   const { dark, toggle } = useTheme();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
 
   const links = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -25,8 +24,10 @@ export default function Sidebar() {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <aside className={`fixed left-0 top-0 h-screen z-40 flex flex-col transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[240px]'}`}
-      style={{ backgroundColor: 'var(--sidebar-bg)' }}>
+    <aside 
+      className="fixed left-0 top-0 h-screen z-40 flex flex-col transition-all duration-300"
+      style={{ width: collapsed ? '80px' : '256px', backgroundColor: 'var(--sidebar-bg)' }}
+    >
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0">

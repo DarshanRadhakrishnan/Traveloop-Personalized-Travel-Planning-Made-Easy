@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { formatDateShort, getTripStatus, daysBetween } from '@/lib/utils';
 import cities from '@/data/cities.json';
-import { Plus, MapPin, Calendar, TrendingUp, Globe, Plane, ChevronRight, Star } from 'lucide-react';
+import { Plus, MapPin, Calendar, TrendingUp, Globe, Plane, ChevronRight, Star, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -26,145 +26,182 @@ export default function DashboardPage() {
 
   const recommendedCities = cities.sort((a, b) => b.popularity - a.popularity).slice(0, 8);
 
-  const statusColors = {
-    upcoming: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-    past: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 animate-[fade-in_0.3s_ease-out]">
-      {/* Hero CTA */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 p-8 text-white shadow-xl shadow-amber-500/20">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
-        <div className="absolute bottom-0 left-1/3 w-40 h-40 bg-white/10 rounded-full translate-y-1/2 blur-xl"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold font-[Playfair_Display] mb-2">Ready for your next trip?</h1>
-            <p className="text-amber-50 text-lg max-w-lg">Create a personalized itinerary, track your budget, and share your adventures with the world.</p>
+    <div className="p-6 md:p-10 max-w-[1200px] mx-auto min-h-screen bg-[#FFF8F0] space-y-12 animate-[fade-in_0.4s_ease-out]">
+      
+      {/* Header & Greeting */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-[40px] leading-tight font-bold font-[Playfair_Display] text-[#0F172A] tracking-tight">
+            {getGreeting()},<br />
+            <span className="text-[#F59E0B]">{user?.name?.split(' ')[0] || 'Traveler'}</span>
+          </h1>
+          <p className="text-[15px] text-[#64748B] font-sans mt-2 max-w-md">
+            Where will your curiosity take you next? Discover new destinations and build unforgettable itineraries.
+          </p>
+        </div>
+        <button onClick={() => navigate('/trips/new')}
+          className="flex items-center gap-2 h-[48px] px-6 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-[14px] font-sans font-semibold transition-all shadow-xl shadow-[#0F172A]/20 hover:shadow-[#0F172A]/30 w-fit">
+          <Plus className="w-5 h-5 text-[#F59E0B]" />
+          Plan a Journey
+        </button>
+      </div>
+
+      {/* Main Hero & Quick Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Editorial Hero Card */}
+        <div className="lg:col-span-2 relative h-[320px] rounded-[24px] overflow-hidden group cursor-pointer border-[0.5px] border-[#F0E8DC]" onClick={() => navigate('/search')}>
+          <img 
+            src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80" 
+            alt="Paris" 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/80 via-[#0F172A]/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 p-8">
+            <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-white text-[12px] font-semibold tracking-wider uppercase mb-3">
+              Destination Spotlight
+            </span>
+            <h2 className="text-[32px] font-[Playfair_Display] font-bold text-white mb-2">The Magic of Paris</h2>
+            <p className="text-white/80 font-sans text-[14px] max-w-sm flex items-center gap-2">
+              Explore curated activities and iconic sights <ArrowRight className="w-4 h-4" />
+            </p>
           </div>
-          <button onClick={() => navigate('/trips/new')}
-            className="flex items-center gap-2 px-6 py-3 bg-white text-amber-600 rounded-xl font-semibold hover:bg-amber-50 transition-all shadow-lg animate-[pulse-gentle_2s_ease-in-out_infinite] flex-shrink-0">
-            <Plus className="w-5 h-5" />
-            Plan New Trip
-          </button>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+          {[
+            { label: 'Journeys Taken', value: trips.length, icon: Plane, bg: 'bg-[#F5F0EA]', color: 'text-[#F59E0B]' },
+            { label: 'Cities Explored', value: totalCities, icon: MapPin, bg: 'bg-[#E0F2FE]', color: 'text-[#0284C7]' },
+            { label: 'Countries Visited', value: totalCountries, icon: Globe, bg: 'bg-[#DCFCE7]', color: 'text-[#16A34A]' },
+            { label: 'Total Invested', value: `$${totalSpend.toLocaleString()}`, icon: TrendingUp, bg: 'bg-[#F3E8FF]', color: 'text-[#9333EA]' },
+          ].map((stat, i) => (
+            <div key={i} className="flex items-center gap-5 p-5 bg-[#FFFFFF] border-[0.5px] border-[#EDE9E4] rounded-[20px] hover:border-[#F59E0B] hover:shadow-sm transition-all duration-300">
+              <div className={`w-[48px] h-[48px] rounded-[14px] ${stat.bg} flex items-center justify-center flex-shrink-0`}>
+                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              </div>
+              <div>
+                <p className="text-[20px] font-bold text-[#0F172A] leading-tight">{loading ? '—' : stat.value}</p>
+                <p className="text-[12px] font-semibold text-[#64748B] uppercase tracking-[0.04em] mt-0.5">{stat.label}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Trips', value: trips.length, icon: Plane, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-          { label: 'Cities Visited', value: totalCities, icon: MapPin, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-          { label: 'Countries', value: totalCountries, icon: Globe, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-          { label: 'Total Spend', value: `$${totalSpend.toLocaleString()}`, icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-        ].map((stat) => (
-          <div key={stat.label} className="p-5 rounded-2xl bg-surface border border-border hover:border-primary/30 transition-all duration-200 animate-[slide-up_0.4s_ease-out]">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`p-2.5 rounded-xl ${stat.bg}`}>
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-foreground">{loading ? '—' : stat.value}</p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Upcoming Trips */}
+      {/* Upcoming Journeys */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold font-[Playfair_Display] text-foreground">Upcoming Trips</h2>
-          <Link to="/trips" className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1">
+        <div className="flex items-end justify-between mb-6 pb-4 border-b border-[#EDE9E4]">
+          <h2 className="text-[24px] font-bold font-[Playfair_Display] text-[#0F172A]">Upcoming Journeys</h2>
+          <Link to="/trips" className="text-[14px] text-[#F59E0B] font-semibold flex items-center gap-1 hover:text-[#D97706] transition-colors">
             View all <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-64 skeleton rounded-2xl"></div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => <div key={i} className="h-[280px] bg-[#FAFAF9] animate-pulse rounded-[24px] border border-[#EDE9E4]"></div>)}
           </div>
         ) : upcomingTrips.length === 0 ? (
-          <div className="text-center py-16 bg-surface rounded-2xl border border-border">
-            <Plane className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-semibold text-foreground mb-2">No trips yet</p>
-            <p className="text-muted-foreground mb-6">Start planning your first adventure!</p>
-            <button onClick={() => navigate('/trips/new')}
-              className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors">
-              Create Trip
+          <div className="flex flex-col items-center justify-center py-16 bg-[#FFFFFF] border-[0.5px] border-[#EDE9E4] rounded-[24px]">
+            <div className="w-[64px] h-[64px] rounded-full bg-[#F5F0EA] flex items-center justify-center mb-4">
+              <Plane className="w-8 h-8 text-[#F59E0B]" />
+            </div>
+            <p className="text-[18px] font-[Playfair_Display] font-bold text-[#0F172A] mb-1">No upcoming trips</p>
+            <p className="text-[14px] text-[#64748B] font-sans mb-6">Your passport is waiting for its next stamp.</p>
+            <button onClick={() => navigate('/trips/new')} className="h-[44px] px-6 bg-[#F59E0B] hover:bg-[#E8920A] text-white rounded-[12px] font-sans font-semibold transition-colors">
+              Start Planning
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {upcomingTrips.map((trip, i) => {
-              const status = getTripStatus(trip.startDate, trip.endDate);
-              const days = daysBetween(trip.startDate, trip.endDate);
-              return (
-                <Link key={trip.id} to={`/trips/${trip.id}`}
-                  className="group rounded-2xl bg-surface border border-border overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-                  style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className="h-40 bg-gradient-to-br from-amber-400/20 to-orange-400/20 relative overflow-hidden">
-                    {trip.coverPhoto && (
-                      <img src={trip.coverPhoto} alt={trip.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    )}
-                    <div className="absolute top-3 right-3">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${statusColors[status]}`}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {upcomingTrips.map((trip, i) => (
+              <Link key={trip.id} to={`/trips/${trip.id}`} className="group bg-[#FFFFFF] border-[0.5px] border-[#EDE9E4] rounded-[24px] overflow-hidden hover:border-[#F59E0B] hover:shadow-xl hover:shadow-[#F59E0B]/5 transition-all duration-300 flex flex-col h-[300px]">
+                <div className="h-[160px] relative overflow-hidden bg-[#F5F0EA]">
+                  {trip.coverPhoto && (
+                    <img src={trip.coverPhoto} alt={trip.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  )}
+                  <div className="absolute top-4 right-4">
+                    <span className="px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[11px] font-bold text-[#0F172A] tracking-wider uppercase shadow-sm">
+                      {daysBetween(new Date(), trip.startDate) > 0 ? `In ${daysBetween(new Date(), trip.startDate)} days` : 'Happening Now'}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-[18px] font-bold font-[Playfair_Display] text-[#0F172A] mb-1.5 group-hover:text-[#F59E0B] transition-colors line-clamp-1">{trip.name}</h3>
+                    <div className="flex items-center gap-2 text-[13px] text-[#64748B] font-sans">
+                      <Calendar className="w-4 h-4" />
+                      <span>{formatDateShort(trip.startDate)} - {formatDateShort(trip.endDate)}</span>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">{trip.name}</h3>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{formatDateShort(trip.startDate)}</span>
-                      <span>•</span>
-                      <span>{days} days</span>
-                      <span>•</span>
-                      <span>{trip._count?.stops || trip.stops?.length || 0} cities</span>
-                    </div>
-                    <div className="flex gap-1 mt-3">
-                      {(trip.stops || []).slice(0, 4).map(s => (
-                        <span key={s.id} className="text-sm" title={s.cityName}>{s.flag}</span>
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#EDE9E4]">
+                    <div className="flex -space-x-2">
+                      {(trip.stops || []).slice(0, 4).map((s, idx) => (
+                        <div key={s.id} className="w-[32px] h-[32px] rounded-full border-2 border-white bg-[#F5F0EA] flex items-center justify-center text-[14px] shadow-sm z-10" style={{ zIndex: 10 - idx }} title={s.cityName}>
+                          {s.flag}
+                        </div>
                       ))}
+                      {(trip.stops || []).length > 4 && (
+                        <div className="w-[32px] h-[32px] rounded-full border-2 border-white bg-[#0F172A] flex items-center justify-center text-[11px] font-bold text-white shadow-sm z-0">
+                          +{trip.stops.length - 4}
+                        </div>
+                      )}
                     </div>
+                    <span className="text-[13px] font-semibold text-[#F59E0B]">View details</span>
                   </div>
-                </Link>
-              );
-            })}
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </section>
 
       {/* Recommended Destinations */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold font-[Playfair_Display] text-foreground">Recommended Destinations</h2>
-          <Link to="/search" className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1">
+      <section className="pb-12">
+        <div className="flex items-end justify-between mb-6 pb-4 border-b border-[#EDE9E4]">
+          <h2 className="text-[24px] font-bold font-[Playfair_Display] text-[#0F172A]">Curated Escapes</h2>
+          <Link to="/search" className="text-[14px] text-[#F59E0B] font-semibold flex items-center gap-1 hover:text-[#D97706] transition-colors">
             Explore all <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 snap-x">
+        <div className="flex gap-5 overflow-x-auto pb-6 -mx-6 px-6 md:-mx-10 md:px-10 snap-x hide-scrollbar">
           {recommendedCities.map((city) => (
-            <div key={city.name} className="flex-shrink-0 w-48 group cursor-pointer snap-start" onClick={() => navigate('/search')}>
-              <div className="h-32 rounded-2xl overflow-hidden mb-2 relative">
-                <img src={city.image} alt={city.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                <div className="absolute bottom-2 left-3 right-3">
-                  <p className="text-white text-sm font-medium">{city.flag} {city.name}</p>
-                  <p className="text-white/70 text-xs">{city.country}</p>
+            <div key={city.name} className="flex-shrink-0 w-[220px] group cursor-pointer snap-start" onClick={() => navigate('/search')}>
+              <div className="h-[280px] rounded-[24px] overflow-hidden relative mb-4 border-[0.5px] border-[#F0E8DC]">
+                <img src={city.image} alt={city.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/70 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-full px-2.5 py-1 flex items-center gap-1">
+                  <Star className="w-3.5 h-3.5 text-[#F59E0B] fill-[#F59E0B]" />
+                  <span className="text-[12px] font-bold text-white">{city.popularity}%</span>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground px-1">
-                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span>{city.popularity}% popular</span>
-                <span className="ml-auto font-medium text-foreground">{'$'.repeat(city.costIndex)}</span>
+
+                <div className="absolute bottom-5 left-5 right-5">
+                  <h3 className="text-[20px] font-bold font-[Playfair_Display] text-white leading-tight mb-1">{city.flag} {city.name}</h3>
+                  <div className="flex justify-between items-center text-white/80 text-[13px] font-sans">
+                    <span>{city.country}</span>
+                    <span className="font-medium text-[#F59E0B]">{'$'.repeat(city.costIndex)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
+
+      {/* CSS hide scrollbar helper */}
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }

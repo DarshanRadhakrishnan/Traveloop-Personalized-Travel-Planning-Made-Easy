@@ -18,8 +18,11 @@ import PublicTripPage from '@/pages/PublicTripPage';
 import TripNotesPage from '@/pages/TripNotesPage';
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
 
+import { useState } from 'react';
+
 function ProtectedLayout() {
   const { user, loading } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
 
   if (loading) {
     return (
@@ -35,9 +38,12 @@ function ProtectedLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 ml-[240px] min-h-screen transition-all duration-300">
+    <div className="min-h-screen bg-[#FFF8F0] flex">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <main 
+        className="flex-1 min-h-screen transition-all duration-300"
+        style={{ marginLeft: collapsed ? '80px' : '256px' }}
+      >
         <Navbar />
         <Outlet />
       </main>

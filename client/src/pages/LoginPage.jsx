@@ -1,179 +1,329 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Plane, Eye, EyeOff, ArrowRight, MapPin } from 'lucide-react';
+import { Plane, Eye, EyeOff, Phone, Lock, User, Heart, Users, Mountain, Building, Utensils, TreePine, Crown, Camera } from 'lucide-react';
+
+// Reusable Input Component
+const Input = ({ label, icon: Icon, rightIcon, error, ...props }) => (
+  <div className="flex flex-col gap-[7px]">
+    <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">{label}</label>
+    <div className="relative">
+      <input 
+        {...props}
+        className={`w-full h-[44px] px-[14px] rounded-[12px] border-[1.5px] border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A] text-[14px] font-sans placeholder:text-[#C4BFBA] focus:outline-none focus:border-[#F59E0B] focus:bg-[#FFFDF9] transition-colors ${rightIcon ? 'pr-[40px]' : ''}`}
+      />
+      {rightIcon && <div className="absolute right-[12px] top-1/2 -translate-y-1/2 text-[#C4BFBA]">{rightIcon}</div>}
+    </div>
+  </div>
+);
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState('');
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Login State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  // Signup State
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  
+  // Extra signup state (UI only for now)
+  const [country, setCountry] = useState('');
+  const [dob, setDob] = useState('');
+  const [travelerType, setTravelerType] = useState('');
+  const [interests, setInterests] = useState([]);
+  const [budget, setBudget] = useState('');
+
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email || !password || (!isLogin && !name)) {
-      setError('Please fill in all fields');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
+    if (!email || !password) return setError('Please fill in all fields');
+    
     setLoading(true);
     try {
-      if (isLogin) {
-        await login(email, password);
-      } else {
-        await register(name, email, password);
-      }
+      await login(email, password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong');
+      setError(err.response?.data?.error || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await register(`${firstName} ${lastName}`, email, password);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const nextStep = () => {
+    setError('');
+    if (step === 1) {
+      if (!firstName || !lastName || !email || !password || !confirmPassword) return setError('Please fill all fields');
+      if (password !== confirmPassword) return setError('Passwords do not match');
+      if (password.length < 8) return setError('Password must be at least 8 characters');
+    }
+    if (step === 2 && !travelerType) return setError('Please select a traveler type');
+    setStep(s => s + 1);
+  };
+
+  const prevStep = () => setStep(s => s - 1);
+
+  const toggleInterest = (i) => {
+    if (interests.includes(i)) setInterests(interests.filter(x => x !== i));
+    else setInterests([...interests, i]);
+  };
+
+  // Password strength calculator
+  const getPwStrength = () => {
+    if (!password) return 0;
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password) && /[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return score; // 0, 1, 2, or 3
+  };
+  const pwStrength = getPwStrength();
+
+
+
   return (
-    <div className="min-h-screen flex">
-      {/* Left Hero Panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)' }}>
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-amber-400/30 blur-3xl"></div>
-          <div className="absolute bottom-32 right-16 w-96 h-96 rounded-full bg-emerald-400/20 blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-amber-300/10 blur-3xl"></div>
+    <div className="min-h-screen bg-[#FFF8F0] flex items-center justify-center p-4">
+      <div className="w-full max-w-[480px] bg-[#FFFFFF] border-[0.5px] border-[#F0E8DC] rounded-[24px] px-[48px] py-[48px]">
+        
+        {/* Header */}
+        <div className="flex flex-col items-center mb-[32px]">
+          <div className="w-[56px] h-[56px] rounded-full bg-[#F59E0B] flex items-center justify-center mb-4">
+            <Plane className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="text-[26px] font-bold font-[Playfair_Display] text-[#0F172A] mb-1">Traveloop</h1>
+          <p className="text-[13px] text-[#94A3B8] font-sans">Your journey begins here</p>
         </div>
 
-        <div className="relative z-10 flex flex-col justify-center px-16 text-white">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-              <Plane className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-3xl font-bold font-[Playfair_Display]">Traveloop</span>
-          </div>
-          <h1 className="text-5xl font-bold font-[Playfair_Display] leading-tight mb-6">
-            Your next<br />
-            <span className="bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">adventure</span><br />
-            starts here
-          </h1>
-          <p className="text-lg text-slate-300 max-w-md mb-12">
-            Plan multi-city trips, track budgets, build itineraries, and share your journeys — all in one beautiful platform.
-          </p>
-
-          {/* Floating city cards */}
-          <div className="flex gap-4">
-            {[
-              { city: 'Paris', flag: '🇫🇷', color: 'from-blue-500 to-indigo-600' },
-              { city: 'Tokyo', flag: '🇯🇵', color: 'from-rose-500 to-pink-600' },
-              { city: 'Bali', flag: '🇮🇩', color: 'from-emerald-500 to-teal-600' },
-            ].map((c) => (
-              <div key={c.city} className={`px-4 py-3 rounded-2xl bg-gradient-to-br ${c.color} bg-opacity-20 backdrop-blur-sm border border-white/10 animate-[slide-up_0.5s_ease-out]`}>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span className="text-sm font-medium">{c.flag} {c.city}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right Form Panel */}
-      <div className="flex-1 flex items-center justify-center px-8 py-12 bg-background">
-        <div className="w-full max-w-md animate-[fade-in_0.4s_ease-out]">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-              <Plane className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold font-[Playfair_Display] text-foreground">Traveloop</span>
-          </div>
-
-          <h2 className="text-3xl font-bold font-[Playfair_Display] text-foreground mb-2">
-            {isLogin ? 'Welcome back' : 'Create your account'}
-          </h2>
-          <p className="text-muted-foreground mb-8">
-            {isLogin ? 'Enter your credentials to continue your journey' : 'Start planning your dream trips today'}
-          </p>
-
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm animate-[scale-in_0.2s_ease-out]">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  placeholder="Alex Wanderer" />
-              </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                placeholder="hello@traveloop.com" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
-              <div className="relative">
-                <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all pr-12"
-                  placeholder="••••••••" />
-                <button type="button" onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-                  {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-
-            {isLogin && (
-              <div className="text-right">
-                <button type="button" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
-                  Forgot password?
-                </button>
-              </div>
-            )}
-
-            <button type="submit" disabled={loading}
-              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold flex items-center justify-center gap-2 transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 disabled:opacity-60">
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                <>
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+        {/* Tab Switcher (Only visible on Login or Step 1 Signup) */}
+        {(isLogin || (!isLogin && step === 1)) && (
+          <div className="flex bg-[#F5F0EA] rounded-[12px] p-[4px] mb-[32px]">
+            <button 
+              type="button"
+              onClick={() => { setIsLogin(true); setError(''); setStep(1); }}
+              className={`flex-1 py-2 text-[14px] font-medium font-sans transition-all ${isLogin ? 'bg-white border-[0.5px] border-[#EDE9E4] rounded-[9px] text-[#0F172A] shadow-sm' : 'text-[#94A3B8]'}`}
+            >
+              Sign in
             </button>
+            <button 
+              type="button"
+              onClick={() => { setIsLogin(false); setError(''); }}
+              className={`flex-1 py-2 text-[14px] font-medium font-sans transition-all ${!isLogin ? 'bg-white border-[0.5px] border-[#EDE9E4] rounded-[9px] text-[#0F172A] shadow-sm' : 'text-[#94A3B8]'}`}
+            >
+              Create account
+            </button>
+          </div>
+        )}
+
+        {/* Signup Progress Bar */}
+        {!isLogin && (
+          <div className="flex items-center justify-between mb-[28px]">
+            <div className="flex gap-2">
+              {[1, 2, 3].map(s => (
+                <div key={s} className={`w-[28px] h-[4px] rounded-[2px] transition-colors ${step >= s ? 'bg-[#F59E0B]' : 'bg-[#EDE9E4]'}`} />
+              ))}
+            </div>
+            <span className="text-[11px] font-medium text-[#94A3B8] font-sans">Step {step} of 3</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-[20px] text-[12px] text-[#E24B4A] text-center font-medium">{error}</div>
+        )}
+
+        {/* === SIGN IN FLOW === */}
+        {isLogin && (
+          <form onSubmit={handleLoginSubmit} className="flex flex-col gap-[20px]">
+            <Input label="EMAIL ADDRESS" type="email" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+            
+            <div className="flex flex-col gap-[7px]">
+              <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">PASSWORD</label>
+              <div className="relative">
+                <input 
+                  type={showPw ? 'text' : 'password'} placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)}
+                  className="w-full h-[44px] px-[14px] pr-[40px] rounded-[12px] border-[1.5px] border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A] text-[14px] font-sans placeholder:text-[#C4BFBA] focus:outline-none focus:border-[#F59E0B] focus:bg-[#FFFDF9] transition-colors"
+                />
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-[12px] top-1/2 -translate-y-1/2 text-[#C4BFBA]">
+                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <div className="flex justify-end mt-[6px]">
+                <button type="button" className="text-[12px] font-semibold text-[#F59E0B]">Forgot password?</button>
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading} className="w-full h-[48px] bg-[#F59E0B] hover:bg-[#E8920A] text-white text-[15px] font-semibold rounded-[14px] font-sans transition-colors mt-[12px]">
+              {loading ? 'Signing in...' : 'Sign in →'}
+            </button>
+
+            <p className="text-[11px] text-[#C4BFBA] text-center font-sans mt-[8px]">Demo: demo@traveloop.com / demo123</p>
+
+            <div className="text-center mt-[12px]">
+              <p className="text-[13px] text-[#94A3B8] font-sans">
+                Don't have an account? <button type="button" onClick={() => setIsLogin(false)} className="text-[#F59E0B] font-semibold">Sign up</button>
+              </p>
+            </div>
           </form>
+        )}
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-              <button onClick={() => { setIsLogin(!isLogin); setError(''); }}
-                className="text-primary hover:text-primary/80 font-semibold transition-colors">
-                {isLogin ? 'Sign up' : 'Sign in'}
-              </button>
-            </p>
-          </div>
+        {/* === SIGN UP FLOW === */}
+        {!isLogin && (
+          <form onSubmit={step === 3 ? handleSignupSubmit : (e) => { e.preventDefault(); nextStep(); }} className="flex flex-col gap-[20px]">
+            
+            {/* Step 1: Basic Info */}
+            {step === 1 && (
+              <>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <Input label="FIRST NAME" placeholder="Alex" value={firstName} onChange={e => setFirstName(e.target.value)} />
+                  <Input label="LAST NAME" placeholder="Wanderer" value={lastName} onChange={e => setLastName(e.target.value)} />
+                </div>
+                <Input label="EMAIL ADDRESS" type="email" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+                <Input label="PHONE NUMBER" type="tel" placeholder="+91 98765 43210" value={phone} onChange={e => setPhone(e.target.value)} rightIcon={<Phone className="w-4 h-4" />} />
+                
+                <div className="flex flex-col gap-[7px]">
+                  <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">PASSWORD</label>
+                  <div className="relative">
+                    <input 
+                      type={showPw ? 'text' : 'password'} placeholder="Min 8 characters" value={password} onChange={e => setPassword(e.target.value)}
+                      className="w-full h-[44px] px-[14px] pr-[40px] rounded-[12px] border-[1.5px] border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A] text-[14px] font-sans placeholder:text-[#C4BFBA] focus:outline-none focus:border-[#F59E0B] focus:bg-[#FFFDF9] transition-colors"
+                    />
+                    <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-[12px] top-1/2 -translate-y-1/2 text-[#C4BFBA]">
+                      {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {/* Password Strength */}
+                  {password && (
+                    <div className="flex gap-1 mt-1">
+                      {[1, 2, 3].map(lvl => (
+                        <div key={lvl} className={`h-1 flex-1 rounded-full ${pwStrength >= lvl ? (pwStrength === 1 ? 'bg-red-400' : pwStrength === 2 ? 'bg-amber-400' : 'bg-emerald-500') : 'bg-[#EDE9E4]'}`} />
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-          {/* Demo credentials hint */}
-          <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-border">
-            <p className="text-xs text-muted-foreground text-center">
-              <strong>Demo:</strong> demo@traveloop.com / demo123
-            </p>
-          </div>
-        </div>
+                <Input label="CONFIRM PASSWORD" type={showConfirmPw ? 'text' : 'password'} placeholder="Re-enter password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} rightIcon={<button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)}><Lock className="w-4 h-4" /></button>} />
+                
+                <button type="submit" className="w-full h-[48px] bg-[#F59E0B] hover:bg-[#E8920A] text-white text-[15px] font-semibold rounded-[14px] font-sans transition-colors mt-[12px]">Continue →</button>
+              </>
+            )}
+
+            {/* Step 2: Travel Profile */}
+            {step === 2 && (
+              <>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <div className="flex flex-col gap-[7px]">
+                    <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">COUNTRY</label>
+                    <select value={country} onChange={e => setCountry(e.target.value)} className="w-full h-[44px] px-[14px] rounded-[12px] border-[1.5px] border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A] text-[14px] font-sans focus:outline-none focus:border-[#F59E0B] focus:bg-[#FFFDF9] appearance-none cursor-pointer">
+                      <option value="" disabled>Select</option>
+                      <option value="us">United States</option>
+                      <option value="uk">United Kingdom</option>
+                      <option value="in">India</option>
+                      <option value="au">Australia</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <Input label="DATE OF BIRTH" type="date" value={dob} onChange={e => setDob(e.target.value)} />
+                </div>
+
+                <div className="flex flex-col gap-[12px] mt-2">
+                  <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">I TRAVEL AS</label>
+                  <div className="grid grid-cols-2 gap-[14px]">
+                    {[
+                      { id: 'solo', label: 'Solo', icon: User },
+                      { id: 'couple', label: 'Couple', icon: Heart },
+                      { id: 'family', label: 'Family', icon: Users },
+                      { id: 'group', label: 'Group', icon: Users }
+                    ].map(type => (
+                      <button key={type.id} type="button" onClick={() => setTravelerType(type.id)}
+                        className={`flex items-center gap-2 px-[8px] py-[9px] rounded-[10px] border-[1.5px] transition-colors ${travelerType === type.id ? 'border-[#F59E0B] bg-[#FFFBEF] text-[#92400E]' : 'border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A]'}`}>
+                        <type.icon className="w-4 h-4 text-[#F59E0B]" />
+                        <span className="text-[14px] font-medium font-sans">{type.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-[14px] mt-[12px]">
+                  <button type="button" onClick={prevStep} className="flex-1 h-[48px] border-[1.5px] border-[#F59E0B] text-[#F59E0B] bg-transparent hover:bg-[#FFFBEF] text-[15px] font-semibold rounded-[14px] font-sans transition-colors">Back</button>
+                  <button type="submit" className="flex-1 h-[48px] bg-[#F59E0B] hover:bg-[#E8920A] text-white text-[15px] font-semibold rounded-[14px] font-sans transition-colors">Continue →</button>
+                </div>
+              </>
+            )}
+
+            {/* Step 3: Travel Interests */}
+            {step === 3 && (
+              <>
+                <div className="flex flex-col gap-[12px]">
+                  <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">TRAVEL INTERESTS</label>
+                  <div className="grid grid-cols-3 gap-[10px]">
+                    {[
+                      { id: 'adventure', label: 'Adventure', icon: Mountain },
+                      { id: 'culture', label: 'Culture', icon: Building },
+                      { id: 'food', label: 'Food', icon: Utensils },
+                      { id: 'nature', label: 'Nature', icon: TreePine },
+                      { id: 'luxury', label: 'Luxury', icon: Crown },
+                      { id: 'photo', label: 'Photo', icon: Camera }
+                    ].map(int => (
+                      <button key={int.id} type="button" onClick={() => toggleInterest(int.id)}
+                        className={`flex flex-col items-center justify-center gap-1.5 p-[10px] rounded-[10px] border-[1.5px] transition-colors ${interests.includes(int.id) ? 'border-[#F59E0B] bg-[#FFFBEF] text-[#92400E]' : 'border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A]'}`}>
+                        <int.icon className={`w-5 h-5 ${interests.includes(int.id) ? 'text-[#F59E0B]' : 'text-[#94A3B8]'}`} />
+                        <span className="text-[12px] font-medium font-sans">{int.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-[7px] mt-2">
+                  <label className="text-[12px] font-semibold text-[#64748B] tracking-[0.04em] uppercase font-sans">TYPICAL TRIP BUDGET</label>
+                  <select value={budget} onChange={e => setBudget(e.target.value)} className="w-full h-[44px] px-[14px] rounded-[12px] border-[1.5px] border-[#EDE9E4] bg-[#FAFAF9] text-[#0F172A] text-[14px] font-sans focus:outline-none focus:border-[#F59E0B] focus:bg-[#FFFDF9] appearance-none cursor-pointer">
+                    <option value="" disabled>Select typical budget</option>
+                    <option value="budget">Budget — under $500</option>
+                    <option value="mid">Mid-range — $500 to $2,000</option>
+                    <option value="premium">Premium — $2,000 to $5,000</option>
+                    <option value="luxury">Luxury — $5,000+</option>
+                  </select>
+                </div>
+
+                <div className="flex gap-[14px] mt-[12px]">
+                  <button type="button" onClick={prevStep} disabled={loading} className="flex-1 h-[48px] border-[1.5px] border-[#F59E0B] text-[#F59E0B] bg-transparent hover:bg-[#FFFBEF] text-[15px] font-semibold rounded-[14px] font-sans transition-colors disabled:opacity-50">Back</button>
+                  <button type="submit" disabled={loading} className="flex-[2] h-[48px] bg-[#F59E0B] hover:bg-[#E8920A] text-white text-[15px] font-semibold rounded-[14px] font-sans transition-colors disabled:opacity-70">
+                    {loading ? 'Creating...' : 'Start exploring →'}
+                  </button>
+                </div>
+
+                <div className="text-center mt-[20px]">
+                  <p className="text-[13px] text-[#94A3B8] font-sans">
+                    Already have an account? <button type="button" onClick={() => { setIsLogin(true); setStep(1); }} className="text-[#F59E0B] font-semibold">Sign in</button>
+                  </p>
+                </div>
+              </>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );
