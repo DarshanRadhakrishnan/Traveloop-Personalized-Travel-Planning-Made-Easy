@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   email        String   @unique
   passwordHash String
@@ -20,8 +20,8 @@ model User {
 }
 
 model Trip {
-  id             String          @id @default(cuid())
-  userId         String
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String          @db.ObjectId
   name           String
   description    String?
   startDate      DateTime
@@ -37,8 +37,8 @@ model Trip {
 }
 
 model Stop {
-  id            String     @id @default(cuid())
-  tripId        String
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  tripId        String     @db.ObjectId
   cityName      String
   country       String
   lat           Float?
@@ -53,8 +53,8 @@ model Stop {
 }
 
 model Activity {
-  id              String   @id @default(cuid())
-  stopId          String
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  stopId          String   @db.ObjectId
   name            String
   type            String   @default("sightseeing")
   cost            Float    @default(0)
@@ -66,8 +66,8 @@ model Activity {
 }
 
 model BudgetItem {
-  id            String @id @default(cuid())
-  tripId        String
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  tripId        String @db.ObjectId
   category      String
   estimatedCost Float  @default(0)
   actualCost    Float  @default(0)
@@ -76,8 +76,8 @@ model BudgetItem {
 }
 
 model ChecklistItem {
-  id       String  @id @default(cuid())
-  tripId   String
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  tripId   String  @db.ObjectId
   itemName String
   category String  @default("other")
   isPacked Boolean @default(false)
@@ -85,9 +85,9 @@ model ChecklistItem {
 }
 
 model TripNote {
-  id        String   @id @default(cuid())
-  tripId    String
-  stopId    String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  tripId    String   @db.ObjectId
+  stopId    String?  @db.ObjectId
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
