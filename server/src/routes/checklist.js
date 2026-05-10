@@ -40,6 +40,20 @@ router.post('/trips/:tripId/checklist/bulk', authenticateToken, async (req, res)
   } catch (err) { res.status(500).json({ error: 'Internal server error' }); }
 });
 
+// Reset checklist — unpack all items (keep items, set isPacked to false)
+router.post('/trips/:tripId/checklist/reset', authenticateToken, async (req, res) => {
+  try {
+    const trip = await prisma.trip.findFirst({ where: { id: req.params.tripId, userId: req.user.id } });
+    if (!trip) return res.status(404).json({ error: 'Trip not found' });
+    await prisma.checklistItem.updateMany({
+      where: { tripId: req.params.tripId },
+      data: { isPacked: false },
+    });
+    const items = await prisma.checklistItem.findMany({ where: { tripId: req.params.tripId }, orderBy: { category: 'asc' } });
+    res.json(items);
+  } catch (err) { res.status(500).json({ error: 'Internal server error' }); }
+});
+
 router.put('/checklist/:id', authenticateToken, async (req, res) => {
   try {
     const item = await prisma.checklistItem.findUnique({ where: { id: req.params.id }, include: { trip: true } });

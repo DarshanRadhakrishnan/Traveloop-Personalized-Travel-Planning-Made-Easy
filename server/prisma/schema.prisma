@@ -4,19 +4,21 @@ generator client {
 
 datasource db {
   provider = "mongodb"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  email        String   @unique
-  passwordHash String
-  profilePhoto String?
-  language     String   @default("en")
-  role         String   @default("user")
-  createdAt    DateTime @default(now())
-  trips        Trip[]
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  email             String   @unique
+  passwordHash      String
+  profilePhoto      String?
+  language          String   @default("en")
+  role              String   @default("user")
+  savedDestinations String   @default("[]")
+  createdAt         DateTime @default(now())
+  trips             Trip[]
 }
 
 model Trip {
@@ -28,6 +30,7 @@ model Trip {
   endDate        DateTime
   coverPhoto     String?
   isPublic       Boolean         @default(false)
+  shareId        String?         @unique @default(cuid())
   createdAt      DateTime        @default(now())
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   stops          Stop[]
@@ -78,6 +81,8 @@ model BudgetItem {
 model ChecklistItem {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   tripId   String  @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  tripId   String  @db.ObjectId
   itemName String
   category String  @default("other")
   isPacked Boolean @default(false)
@@ -88,7 +93,9 @@ model TripNote {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   tripId    String   @db.ObjectId
   stopId    String?  @db.ObjectId
+  title     String   @default("")
   content   String
+  day       Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
