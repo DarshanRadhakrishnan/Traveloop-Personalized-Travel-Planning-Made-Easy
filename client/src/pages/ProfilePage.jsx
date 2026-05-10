@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import {
   User, Mail, Globe, Trash2, Save, AlertTriangle, MapPin, Plane,
-  Camera, X, Plus, Heart, Upload
+  Camera, X, Plus, Heart, Upload, Check, Edit
 } from 'lucide-react';
 
 const LANGUAGES = [
@@ -36,7 +36,6 @@ export default function ProfilePage() {
     if (user) {
       setForm({ name: user.name || '', email: user.email || '', language: 'en' });
     }
-    // Fetch profile details
     api.get('/auth/me').then(res => {
       if (res.data.language) setForm(f => ({ ...f, language: res.data.language }));
       try {
@@ -45,7 +44,6 @@ export default function ProfilePage() {
       } catch { setSavedDestinations([]); }
     }).catch(() => {});
 
-    // Fetch stats
     api.get('/trips').then(res => {
       const cities = [...new Set(res.data.flatMap(t => (t.stops || []).map(s => s.cityName)))];
       const countries = [...new Set(res.data.flatMap(t => (t.stops || []).map(s => s.country)))];
@@ -102,14 +100,19 @@ export default function ProfilePage() {
   const profilePhotoUrl = user?.profilePhoto;
 
   return (
-    <div className="p-8 max-w-3xl mx-auto animate-[fade-in_0.3s_ease-out]">
-      <h1 className="text-3xl font-bold font-[Playfair_Display] text-foreground mb-8">Profile & Settings</h1>
+    <div className="p-6 md:p-10 max-w-2xl mx-auto animate-[fade-in_0.3s_ease-out] space-y-6">
 
-      {/* Avatar & Stats */}
-      <div className="flex items-center gap-6 p-6 rounded-2xl bg-surface border border-border mb-8">
-        {/* Avatar with upload */}
-        <div className="relative group">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
+      {/* Page Header */}
+      <div className="pb-5 border-b border-[var(--border)] mb-2">
+        <h1 className="text-[22px] font-bold text-[var(--text-primary)]">Profile & Settings</h1>
+        <p className="text-[13px] text-[var(--text-muted)] mt-1">Manage your account and preferences</p>
+      </div>
+
+      {/* Profile Summary Card */}
+      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        {/* Avatar */}
+        <div className="relative group shrink-0">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center text-white text-[22px] font-bold">
             {profilePhotoUrl ? (
               <img src={profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
             ) : (
@@ -119,83 +122,96 @@ export default function ProfilePage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 cursor-pointer">
+            className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
             {uploading ? (
-              <div className="w-6 h-6 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+              <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
             ) : (
-              <Camera className="w-6 h-6 text-white" />
+              <Camera className="w-5 h-5 text-white" />
             )}
           </button>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
         </div>
 
-        <div className="flex-1">
-          <h2 className="text-xl font-semibold text-foreground">{user?.name}</h2>
-          <p className="text-muted-foreground">{user?.email}</p>
+        {/* Name + Email */}
+        <div className="flex-1 text-center sm:text-left">
+          <h2 className="text-[18px] font-bold text-[var(--text-primary)]">{user?.name}</h2>
+          <p className="text-[13px] text-[var(--text-muted)] mt-0.5">{user?.email}</p>
         </div>
-        <div className="flex gap-6 text-center">
-          <div>
-            <p className="text-2xl font-bold text-foreground">{stats.trips}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1"><Plane className="w-3 h-3" />Trips</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{stats.cities}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />Cities</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{stats.countries}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1"><Globe className="w-3 h-3" />Countries</p>
-          </div>
+
+        {/* Stats */}
+        <div className="flex gap-3">
+          {[
+            { val: stats.trips, label: 'Trips', icon: Plane },
+            { val: stats.cities, label: 'Cities', icon: MapPin },
+            { val: stats.countries, label: 'Countries', icon: Globe },
+          ].map((s, i) => (
+            <div key={i} className="bg-[var(--bg-input)] border border-[var(--border)] rounded-full px-3.5 py-1.5 flex flex-col items-center min-w-[60px]">
+              <span className="text-base font-bold text-[var(--text-primary)] mono-num leading-none">{s.val}</span>
+              <span className="text-[10px] text-[var(--text-muted)] font-semibold mt-0.5 flex items-center gap-1"><s.icon className="w-2.5 h-2.5" />{s.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Edit Form */}
-      <form onSubmit={handleSave} className="space-y-5 p-6 rounded-2xl bg-surface border border-border mb-8">
-        <h3 className="font-semibold text-foreground mb-4">Edit Profile</h3>
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5"><User className="w-4 h-4 inline mr-1" />Name</label>
-          <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
+      {/* Edit Profile Section */}
+      <form onSubmit={handleSave} className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6">
+        {/* Section header */}
+        <div className="flex items-center gap-2 pb-3 mb-5 border-b border-[var(--border)]">
+          <Edit size={16} className="text-[var(--purple)]" />
+          <h3 className="text-[14px] font-semibold text-[var(--text-primary)]">Edit Profile</h3>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5"><Mail className="w-4 h-4 inline mr-1" />Email</label>
-          <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50" />
+
+        <div className="space-y-5">
+          <div>
+            <label className="block text-[12px] text-[var(--text-muted)] font-semibold mb-1.5">Name</label>
+            <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+              className="w-full h-[44px] px-3.5 rounded-lg bg-[#0D1526] border border-[#1E2D45] text-[14px] text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all" />
+          </div>
+          <div>
+            <label className="block text-[12px] text-[var(--text-muted)] font-semibold mb-1.5">Email</label>
+            <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+              className="w-full h-[44px] px-3.5 rounded-lg bg-[#0D1526] border border-[#1E2D45] text-[14px] text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all" />
+          </div>
+          <div>
+            <label className="block text-[12px] text-[var(--text-muted)] font-semibold mb-1.5">Language Preference</label>
+            <select value={form.language} onChange={e => setForm({ ...form, language: e.target.value })}
+              className="w-full h-[44px] px-3.5 rounded-lg bg-[#0D1526] border border-[#1E2D45] text-[14px] text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all cursor-pointer">
+              {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+            </select>
+          </div>
+
+          <button type="submit" disabled={saving}
+            className="flex items-center gap-2 h-10 px-5 rounded-lg bg-[var(--accent)] text-[#0D0B1A] font-bold text-[14px] hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-60 border-none">
+            <Check className="w-4 h-4" /> {saving ? 'Saving...' : saveSuccess ? '✓ Saved!' : 'Save Changes'}
+          </button>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5"><Globe className="w-4 h-4 inline mr-1" />Language Preference</label>
-          <select value={form.language} onChange={e => setForm({ ...form, language: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground">
-            {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
-          </select>
-        </div>
-        <button type="submit" disabled={saving}
-          className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors disabled:opacity-60">
-          <Save className="w-4 h-4" /> {saving ? 'Saving...' : saveSuccess ? '✓ Saved!' : 'Save Changes'}
-        </button>
       </form>
 
       {/* Saved Destinations */}
-      <div className="p-6 rounded-2xl bg-surface border border-border mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <Heart className="w-5 h-5 text-rose-500" /> Saved Destinations
-          </h3>
+      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6">
+        <div className="flex items-center justify-between pb-3 mb-5 border-b border-[var(--border)]">
+          <div className="flex items-center gap-2">
+            <Heart size={16} className="text-[var(--coral)]" />
+            <h3 className="text-[14px] font-semibold text-[var(--text-primary)]">Saved Destinations</h3>
+          </div>
           <button onClick={() => setShowAddDest(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors">
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] text-[13px] font-semibold hover:bg-[var(--bg-card-hover)] transition-all">
             <Plus className="w-3.5 h-3.5" /> Add
           </button>
         </div>
 
         {savedDestinations.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">No saved destinations yet. Add your dream locations!</p>
+          <div className="text-center py-5">
+            <span className="text-[28px] block mb-2">🗺️</span>
+            <p className="text-[13px] text-[var(--text-muted)]">No saved destinations yet</p>
+          </div>
         ) : (
           <div className="flex flex-wrap gap-2">
             {savedDestinations.map(dest => (
-              <span key={dest} className="group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted text-foreground text-sm font-medium border border-border hover:border-primary/30 transition-colors">
-                <MapPin className="w-3.5 h-3.5 text-primary" />
+              <span key={dest} className="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-input)] text-[var(--text-primary)] text-[13px] font-semibold border border-[var(--border)] hover:border-[var(--accent)]/30 transition-colors">
+                <MapPin className="w-3.5 h-3.5 text-[var(--accent)]" />
                 {dest}
-                <button onClick={() => removeDestination(dest)} className="opacity-0 group-hover:opacity-100 ml-0.5 text-red-400 hover:text-red-600 transition-all">
+                <button onClick={() => removeDestination(dest)} className="opacity-0 group-hover:opacity-100 ml-0.5 text-[var(--coral)] hover:text-[var(--coral)] transition-all bg-transparent border-none p-0 min-h-0">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </span>
@@ -203,35 +219,39 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Add destination inline */}
         {showAddDest && (
           <div className="mt-4 flex gap-2">
             <input type="text" value={newDest} onChange={e => setNewDest(e.target.value)} placeholder="e.g. Tokyo, Paris, Bali..."
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addDestination(); } }}
-              className="flex-1 px-4 py-2 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" autoFocus />
-            <button onClick={addDestination} className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">Add</button>
-            <button onClick={() => { setShowAddDest(false); setNewDest(''); }} className="px-3 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition-colors">Cancel</button>
+              className="flex-1 h-10 px-3.5 rounded-lg bg-[#0D1526] border border-[#1E2D45] text-[13px] text-[var(--text-primary)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all" autoFocus />
+            <button onClick={addDestination} className="h-10 px-4 rounded-lg bg-[var(--accent)] text-[#0D0B1A] text-[13px] font-bold hover:brightness-110 transition-all">Add</button>
+            <button onClick={() => { setShowAddDest(false); setNewDest(''); }} className="h-10 px-3 rounded-lg border border-[var(--border)] text-[13px] text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] transition-all">Cancel</button>
           </div>
         )}
       </div>
 
       {/* Danger Zone */}
-      <div className="p-6 rounded-2xl border-2 border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/5">
-        <h3 className="font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2"><AlertTriangle className="w-5 h-5" />Danger Zone</h3>
-        <p className="text-sm text-muted-foreground mb-4">Once you delete your account, there is no going back. All your trips and data will be permanently removed.</p>
-        <button onClick={() => setShowDelete(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors text-sm font-medium">
+      <div className="border border-[var(--coral)]/40 bg-[var(--coral)]/[0.03] rounded-2xl p-6">
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-[var(--coral)]/20">
+          <AlertTriangle size={16} className="text-[var(--amber)]" />
+          <h3 className="text-[14px] font-semibold text-[var(--coral)]">Danger Zone</h3>
+        </div>
+        <p className="text-[13px] text-[var(--text-muted)] mb-4">Once you delete your account, there is no going back. All your trips and data will be permanently removed.</p>
+        <button onClick={() => setShowDelete(true)}
+          className="flex items-center gap-2 h-10 px-5 rounded-lg bg-[var(--coral-soft)] border border-[var(--coral)] text-[var(--coral)] text-[14px] font-semibold hover:bg-[var(--coral)] hover:text-white transition-all">
           <Trash2 className="w-4 h-4" /> Delete Account
         </button>
       </div>
 
+      {/* Delete Confirm Modal */}
       {showDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-surface rounded-2xl p-6 w-full max-w-md border border-border shadow-2xl animate-[scale-in_0.2s_ease-out]">
-            <h3 className="text-lg font-bold text-foreground mb-2">Delete Account?</h3>
-            <p className="text-muted-foreground mb-6">This is permanent. All trips, notes, and data will be deleted forever.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[var(--bg-surface)] rounded-2xl p-8 w-full max-w-md border border-[var(--border-strong)] shadow-[var(--shadow-elevated)] animate-[fade-in_0.2s_ease-out]">
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Delete Account?</h3>
+            <p className="text-[var(--text-secondary)] text-[14px] mb-6">This is permanent. All trips, notes, and data will be deleted forever.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setShowDelete(false)} className="px-4 py-2 rounded-xl border border-border text-muted-foreground hover:bg-muted transition-colors">Cancel</button>
-              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors font-medium">Delete Forever</button>
+              <button onClick={() => setShowDelete(false)} className="h-10 px-5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--bg-card)] transition-all text-[14px] font-semibold">Cancel</button>
+              <button onClick={handleDelete} className="h-10 px-5 rounded-lg bg-[var(--coral)] text-white font-bold text-[14px] hover:brightness-110 transition-all">Delete Forever</button>
             </div>
           </div>
         </div>
