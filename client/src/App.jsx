@@ -23,13 +23,14 @@ import { useState } from 'react';
 function ProtectedLayout() {
   const { user, loading } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin"></div>
-          <p className="text-muted-foreground font-medium">Loading Traveloop...</p>
+          <p className="text-muted-foreground font-medium font-body">Loading Traveloop...</p>
         </div>
       </div>
     );
@@ -38,14 +39,22 @@ function ProtectedLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] flex">
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+    <div className="min-h-screen bg-background flex overflow-hidden">
+      <Sidebar 
+        collapsed={collapsed} 
+        setCollapsed={setCollapsed} 
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
+      
       <main 
-        className="flex-1 min-h-screen transition-all duration-300"
-        style={{ marginLeft: collapsed ? '80px' : '256px' }}
+        className="flex-1 min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col w-full"
+        style={{ marginLeft: window.innerWidth >= 768 ? (collapsed ? '80px' : '260px') : '0px' }}
       >
-        <Navbar />
-        <Outlet />
+        <Navbar setMobileOpen={setMobileOpen} />
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
