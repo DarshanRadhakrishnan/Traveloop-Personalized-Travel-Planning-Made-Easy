@@ -92,6 +92,7 @@ router.get('/me', authenticateToken, async (req, res) => {
         profilePhoto: true,
         language: true,
         role: true,
+        savedDestinations: true,
         createdAt: true,
         _count: { select: { trips: true } },
       },
@@ -111,7 +112,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 // Update profile
 router.put('/profile', authenticateToken, async (req, res) => {
   try {
-    const { name, email, profilePhoto, language } = req.body;
+    const { name, email, profilePhoto, language, savedDestinations } = req.body;
     const user = await prisma.user.update({
       where: { id: req.user.id },
       data: {
@@ -119,8 +120,9 @@ router.put('/profile', authenticateToken, async (req, res) => {
         ...(email && { email }),
         ...(profilePhoto !== undefined && { profilePhoto }),
         ...(language && { language }),
+        ...(savedDestinations !== undefined && { savedDestinations: JSON.stringify(savedDestinations) }),
       },
-      select: { id: true, name: true, email: true, profilePhoto: true, language: true, role: true },
+      select: { id: true, name: true, email: true, profilePhoto: true, language: true, role: true, savedDestinations: true },
     });
     res.json(user);
   } catch (err) {

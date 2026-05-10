@@ -16,10 +16,14 @@ import ActivitySearchPage from '@/pages/ActivitySearchPage';
 import ProfilePage from '@/pages/ProfilePage';
 import PublicTripPage from '@/pages/PublicTripPage';
 import TripNotesPage from '@/pages/TripNotesPage';
+import CommunityPage from '@/pages/CommunityPage';
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
+
+import { useState } from 'react';
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
 
   if (loading) {
     return (
@@ -35,11 +39,13 @@ function ProtectedLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 ml-[240px] min-h-screen transition-all duration-300">
+    <div className="flex min-h-screen bg-background font-body">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <main className="flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300">
         <Navbar />
-        <Outlet />
+        <div className="flex-1 overflow-x-hidden">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
@@ -61,6 +67,7 @@ export default function App() {
             {/* Public routes */}
             <Route path="/login" element={<AuthGuard><LoginPage /></AuthGuard>} />
             <Route path="/trip/:id/public" element={<PublicTripPage />} />
+            <Route path="/shared/:shareId" element={<PublicTripPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedLayout />}>
@@ -74,6 +81,7 @@ export default function App() {
               <Route path="/trips/:id/notes" element={<TripNotesPage />} />
               <Route path="/search" element={<CitySearchPage />} />
               <Route path="/activities" element={<ActivitySearchPage />} />
+              <Route path="/community" element={<CommunityPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
             </Route>

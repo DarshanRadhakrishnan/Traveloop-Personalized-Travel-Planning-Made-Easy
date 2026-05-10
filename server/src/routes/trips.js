@@ -25,6 +25,49 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+// Community feed — public trips
+router.get('/community', optionalAuth, async (req, res) => {
+  try {
+    const { search, sort, country } = req.query;
+
+    const where = { isPublic: true };
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { description: { contains: search } },
+      ];
+    }
+
+    let orderBy = { createdAt: 'desc' };
+    if (sort === 'oldest') orderBy = { createdAt: 'asc' };
+    if (sort === 'name') orderBy = { name: 'asc' };
+
+    let trips = await prisma.trip.findMany({
+      where,
+      include: {
+        user: { select: { id: true, name: true, profilePhoto: true } },
+        stops: {
+          select: { id: true, cityName: true, country: true, flag: true },
+          orderBy: { orderIndex: 'asc' },
+        },
+        _count: { select: { stops: true, notes: true } },
+      },
+      orderBy,
+      take: 50,
+    });
+
+    // Filter by country if specified (post-query since SQLite can't filter nested)
+    if (country) {
+      trips = trips.filter(t => t.stops.some(s => s.country.toLowerCase() === country.toLowerCase()));
+    }
+
+    res.json(trips);
+  } catch (err) {
+    console.error('Community feed error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get single trip with all related data
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
@@ -52,7 +95,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Get public trip
+// Get public trip by primary id
 router.get('/:id/public', optionalAuth, async (req, res) => {
   try {
     const trip = await prisma.trip.findFirst({
@@ -75,6 +118,33 @@ router.get('/:id/public', optionalAuth, async (req, res) => {
     res.json(trip);
   } catch (err) {
     console.error('Get public trip error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get public trip by shareId
+router.get('/shared/:shareId', optionalAuth, async (req, res) => {
+  try {
+    const trip = await prisma.trip.findFirst({
+      where: { shareId: req.params.shareId, isPublic: true },
+      include: {
+        user: { select: { name: true, profilePhoto: true } },
+        stops: {
+          include: { activities: { orderBy: { startTime: 'asc' } } },
+          orderBy: { orderIndex: 'asc' },
+        },
+        budgetItems: true,
+        notes: { orderBy: { createdAt: 'desc' } },
+      },
+    });
+
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or not public' });
+    }
+
+    res.json(trip);
+  } catch (err) {
+    console.error('Get shared trip error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

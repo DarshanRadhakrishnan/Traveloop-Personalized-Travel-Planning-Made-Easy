@@ -1,20 +1,20 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { LayoutDashboard, Map, Search, Activity, User, LogOut, Sun, Moon, Plane, ListChecks, DollarSign, StickyNote, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Map, Search, Activity, User, LogOut, Sun, Moon, Plane, ListChecks, DollarSign, StickyNote, Shield, ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, setCollapsed }) {
   const { logout, user } = useAuth();
   const { dark, toggle } = useTheme();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
 
   const links = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/trips', icon: Map, label: 'My Trips' },
     { to: '/search', icon: Search, label: 'Explore Cities' },
     { to: '/activities', icon: Activity, label: 'Explore Activities' },
+    { to: '/community', icon: Users, label: 'Community' },
     { to: '/profile', icon: User, label: 'Profile' },
   ];
 
@@ -25,7 +25,7 @@ export default function Sidebar() {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <aside className={`fixed left-0 top-0 h-screen z-40 flex flex-col transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[240px]'}`}
+    <aside className={`sticky top-0 h-screen flex-shrink-0 z-40 flex flex-col transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}
       style={{ backgroundColor: 'var(--sidebar-bg)' }}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">

@@ -41,13 +41,13 @@ export default function CreateTripPage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto animate-[fade-in_0.3s_ease-out]">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back
+    <div className="p-8 md:p-12 lg:p-16 max-w-5xl mx-auto animate-[fade-in_0.3s_ease-out] w-full">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors text-lg">
+        <ArrowLeft className="w-5 h-5" /> Back
       </button>
 
-      <h1 className="text-3xl font-bold font-[Playfair_Display] text-foreground mb-2">Create New Trip</h1>
-      <p className="text-muted-foreground mb-8">Fill in the details to start planning your adventure</p>
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-[Playfair_Display] text-foreground mb-4">Create New Trip</h1>
+      <p className="text-lg md:text-xl text-muted-foreground mb-12">Fill in the details to start planning your adventure.</p>
 
       {error && (
         <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
@@ -57,44 +57,44 @@ export default function CreateTripPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Trip Name *</label>
+          <label className="block text-base md:text-lg font-medium text-foreground mb-2">Trip Name *</label>
           <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            className="w-full px-5 py-4 text-lg rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm"
             placeholder="e.g., European Summer Adventure" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
-          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+          <label className="block text-base md:text-lg font-medium text-foreground mb-2">Description</label>
+          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={4}
+            className="w-full px-5 py-4 text-lg rounded-xl border border-border bg-surface text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none shadow-sm"
             placeholder="Describe your trip..." />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              <Calendar className="w-4 h-4 inline mr-1" />Start Date *
+            <label className="block text-base md:text-lg font-medium text-foreground mb-2">
+              <Calendar className="w-5 h-5 inline mr-2" />Start Date *
             </label>
             <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" />
+              className="w-full px-5 py-4 text-lg rounded-xl border border-border bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              <Calendar className="w-4 h-4 inline mr-1" />End Date *
+            <label className="block text-base md:text-lg font-medium text-foreground mb-2">
+              <Calendar className="w-5 h-5 inline mr-2" />End Date *
             </label>
             <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" />
+              className="w-full px-5 py-4 text-lg rounded-xl border border-border bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm" />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-3">
-            <Image className="w-4 h-4 inline mr-1" />Cover Photo
+        <div className="pt-2">
+          <label className="block text-base md:text-lg font-medium text-foreground mb-4">
+            <Image className="w-5 h-5 inline mr-2" />Cover Photo
           </label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {coverOptions.map((url) => (
               <button key={url} type="button" onClick={() => setForm({ ...form, coverPhoto: url })}
-                className={`h-24 rounded-xl overflow-hidden border-2 transition-all ${form.coverPhoto === url ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-border hover:border-primary/50'}`}>
+                className={`h-32 md:h-40 rounded-2xl overflow-hidden border-4 transition-all shadow-md ${form.coverPhoto === url ? 'border-primary ring-4 ring-primary/30 scale-[1.02]' : 'border-transparent hover:border-primary/40'}`}>
                 <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
               </button>
             ))}
@@ -102,8 +102,8 @@ export default function CreateTripPage() {
         </div>
 
         <button type="submit" disabled={loading}
-          className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/25 disabled:opacity-60">
-          {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Save className="w-4 h-4" />Create Trip & Start Planning</>}
+          className="w-full py-4 px-8 mt-8 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-lg font-semibold flex items-center justify-center gap-3 transition-all shadow-xl shadow-amber-500/25 disabled:opacity-60">
+          {loading ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div> : <><Save className="w-5 h-5" />Create Trip & Start Planning</>}
         </button>
       </form>
     </div>

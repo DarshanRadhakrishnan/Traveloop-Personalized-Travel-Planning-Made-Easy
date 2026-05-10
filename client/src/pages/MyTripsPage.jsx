@@ -40,36 +40,36 @@ export default function MyTripsPage() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto animate-[fade-in_0.3s_ease-out]">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-8 md:p-12 lg:p-16 max-w-7xl mx-auto animate-[fade-in_0.3s_ease-out] w-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-[Playfair_Display] text-foreground">My Trips</h1>
-          <p className="text-muted-foreground">{trips.length} trips planned</p>
+          <h1 className="text-4xl md:text-5xl font-bold font-[Playfair_Display] text-foreground mb-2">My Trips</h1>
+          <p className="text-lg text-muted-foreground">{trips.length} trips planned</p>
         </div>
         <button onClick={() => navigate('/trips/new')}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-md shadow-primary/20">
-          <Plus className="w-4 h-4" /> New Trip
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground text-lg rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 w-full md:w-auto">
+          <Plus className="w-5 h-5" /> New Trip
         </button>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4 mb-6 flex-wrap">
-        <div className="relative flex-1 max-w-xs">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search trips..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            className="w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-surface text-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm" />
         </div>
-        <div className="flex gap-1 bg-muted/50 rounded-xl p-1">
+        <div className="flex gap-1 bg-muted/50 rounded-xl p-1 overflow-x-auto">
           {['all', 'upcoming', 'active', 'past'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+              className={`px-4 py-2 rounded-lg text-base whitespace-nowrap font-medium transition-colors ${filter === f ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
         </div>
-        <div className="flex gap-1 bg-muted/50 rounded-xl p-1">
-          <button onClick={() => setView('grid')} className={`p-2 rounded-lg ${view === 'grid' ? 'bg-surface shadow-sm' : ''}`}><LayoutGrid className="w-4 h-4" /></button>
-          <button onClick={() => setView('list')} className={`p-2 rounded-lg ${view === 'list' ? 'bg-surface shadow-sm' : ''}`}><List className="w-4 h-4" /></button>
+        <div className="flex gap-1 bg-muted/50 rounded-xl p-1 self-start xl:self-auto">
+          <button onClick={() => setView('grid')} className={`p-2.5 rounded-lg ${view === 'grid' ? 'bg-surface shadow-sm' : ''}`}><LayoutGrid className="w-5 h-5" /></button>
+          <button onClick={() => setView('list')} className={`p-2.5 rounded-lg ${view === 'list' ? 'bg-surface shadow-sm' : ''}`}><List className="w-5 h-5" /></button>
         </div>
       </div>
 
