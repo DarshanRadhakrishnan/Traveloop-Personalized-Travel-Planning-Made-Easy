@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '@/lib/api';
 import { formatDateShort, daysBetween, getActivityIcon, getTripStatus } from '@/lib/utils';
-import { ArrowLeft, Edit, Share2, Calendar, MapPin, Clock, DollarSign, List, Map as MapIcon, Wallet, ChevronDown, ChevronUp, Plane } from 'lucide-react';
+import { ArrowLeft, Edit, Share2, Calendar, MapPin, Clock, DollarSign, List, Map as MapIcon, Wallet, ChevronDown, ChevronUp, Plane, ListChecks, StickyNote } from 'lucide-react';
 
 const parseMeta = (desc) => {
   try { return desc ? JSON.parse(desc) : {}; }
@@ -115,6 +115,22 @@ export default function ItineraryViewPage() {
             <div>
               <h1 className="text-2xl font-bold font-[Playfair_Display] text-foreground">{trip.name}</h1>
             </div>
+          </div>
+
+          {/* Quick Nav - Budget, Checklist, Notes, Edit */}
+          <div className="flex gap-3 flex-wrap px-2">
+            <Link to={`/trips/${id}/edit`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] font-medium hover:bg-[var(--accent)] hover:text-white transition-all text-sm">
+              <Edit className="w-4 h-4" /> Edit Itinerary
+            </Link>
+            <Link to={`/trips/${id}/budget`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-primary)] font-medium hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all text-sm">
+              <Wallet className="w-4 h-4" /> Budget
+            </Link>
+            <Link to={`/trips/${id}/checklist`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-primary)] font-medium hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all text-sm">
+              <ListChecks className="w-4 h-4" /> Checklist
+            </Link>
+            <Link to={`/trips/${id}/notes`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-primary)] font-medium hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all text-sm">
+              <StickyNote className="w-4 h-4" /> Notes
+            </Link>
           </div>
 
           <div className="flex bg-muted/50 p-1 rounded-2xl w-full">

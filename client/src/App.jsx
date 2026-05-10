@@ -17,6 +17,7 @@ import ProfilePage from '@/pages/ProfilePage';
 import PublicTripPage from '@/pages/PublicTripPage';
 import TripNotesPage from '@/pages/TripNotesPage';
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
+import CommunityPage from '@/pages/CommunityPage';
 
 import { useState } from 'react';
 
@@ -76,6 +77,7 @@ export default function App() {
             {/* Public routes */}
             <Route path="/login" element={<AuthGuard><LoginPage /></AuthGuard>} />
             <Route path="/trip/:id/public" element={<PublicTripPage />} />
+            <Route path="/shared/:shareId" element={<PublicTripPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedLayout />}>
@@ -91,6 +93,7 @@ export default function App() {
               <Route path="/activities" element={<ActivitySearchPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/community" element={<CommunityPage />} />
             </Route>
 
             {/* Catch all */}

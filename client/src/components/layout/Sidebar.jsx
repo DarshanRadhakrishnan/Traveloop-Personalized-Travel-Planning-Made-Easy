@@ -1,7 +1,7 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { LayoutDashboard, Map, Search, Activity, User, LogOut, Sun, Moon, Plane, Shield, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { LayoutDashboard, Map, Search, Activity, User, LogOut, Sun, Moon, Plane, Shield, ChevronLeft, ChevronRight, X, Users } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
@@ -16,6 +16,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
     { to: '/search', icon: Search, label: 'Explore Cities' },
     { to: '/activities', icon: Activity, label: 'Explore Activities' },
     { to: '/profile', icon: User, label: 'Profile' },
+    { to: '/community', icon: Users, label: 'Community' },
   ];
 
   if (user?.role === 'admin') {
