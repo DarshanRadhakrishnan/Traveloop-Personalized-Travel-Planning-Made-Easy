@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  profilePhoto String?
+  language     String   @default("en")
+  role         String   @default("user")
+  createdAt    DateTime @default(now())
+  trips        Trip[]
+}
+
+model Trip {
+  id             String          @id @default(cuid())
+  userId         String
+  name           String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime
+  coverPhoto     String?
+  isPublic       Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stops          Stop[]
+  budgetItems    BudgetItem[]
+  checklistItems ChecklistItem[]
+  notes          TripNote[]
+}
+
+model Stop {
+  id            String     @id @default(cuid())
+  tripId        String
+  cityName      String
+  country       String
+  lat           Float?
+  lng           Float?
+  flag          String?
+  arrivalDate   DateTime
+  departureDate DateTime
+  orderIndex    Int
+  trip          Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activities    Activity[]
+  notes         TripNote[]
+}
+
+model Activity {
+  id              String   @id @default(cuid())
+  stopId          String
+  name            String
+  type            String   @default("sightseeing")
+  cost            Float    @default(0)
+  durationMinutes Int      @default(60)
+  description     String?
+  imageUrl        String?
+  startTime       String?
+  stop            Stop     @relation(fields: [stopId], references: [id], onDelete: Cascade)
+}
+
+model BudgetItem {
+  id            String @id @default(cuid())
+  tripId        String
+  category      String
+  estimatedCost Float  @default(0)
+  actualCost    Float  @default(0)
+  notes         String?
+  trip          Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model ChecklistItem {
+  id       String  @id @default(cuid())
+  tripId   String
+  itemName String
+  category String  @default("other")
+  isPacked Boolean @default(false)
+  trip     Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model TripNote {
+  id        String   @id @default(cuid())
+  tripId    String
+  stopId    String?
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  stop      Stop?    @relation(fields: [stopId], references: [id], onDelete: SetNull)
+}

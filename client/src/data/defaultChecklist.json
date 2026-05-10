@@ -1,0 +1,7 @@
+{
+  "clothing": ["T-shirts", "Pants/Shorts", "Underwear", "Socks", "Comfortable Walking Shoes", "Sandals", "Rain Jacket", "Swimwear", "Sleepwear", "Formal outfit"],
+  "documents": ["Passport", "Travel Insurance", "Flight Tickets", "Hotel Reservations", "Visa Documents", "Driver's License", "Emergency Contacts List", "Copies of IDs"],
+  "electronics": ["Phone Charger", "Power Bank", "Universal Adapter", "Camera", "Headphones", "Laptop/Tablet"],
+  "toiletries": ["Toothbrush & Toothpaste", "Shampoo & Conditioner", "Sunscreen", "Deodorant", "Medications", "First Aid Kit", "Hand Sanitizer"],
+  "other": ["Daypack/Backpack", "Water Bottle", "Snacks", "Travel Pillow", "Eye Mask", "Guidebook/Maps", "Luggage Lock"]
+}

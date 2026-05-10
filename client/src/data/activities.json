@@ -1,0 +1,82 @@
+[
+  {
+    "id": "act_1",
+    "city": "Paris",
+    "name": "Eiffel Tower Summit",
+    "type": "sightseeing",
+    "cost": 30,
+    "durationMinutes": 120,
+    "description": "Skip the line and go straight to the top for the best views of Paris.",
+    "image": "https://images.unsplash.com/photo-1543349689-9a4d426bee8e?w=800"
+  },
+  {
+    "id": "act_2",
+    "city": "Paris",
+    "name": "Louvre Museum Tour",
+    "type": "culture",
+    "cost": 20,
+    "durationMinutes": 180,
+    "description": "Guided tour of the world's largest art museum.",
+    "image": "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800"
+  },
+  {
+    "id": "act_3",
+    "city": "Tokyo",
+    "name": "Shibuya Crossing & Hachiko",
+    "type": "sightseeing",
+    "cost": 0,
+    "durationMinutes": 60,
+    "description": "Experience the world's busiest pedestrian crossing.",
+    "image": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800"
+  },
+  {
+    "id": "act_4",
+    "city": "Tokyo",
+    "name": "Sushi Making Class",
+    "type": "food",
+    "cost": 85,
+    "durationMinutes": 150,
+    "description": "Learn to make authentic sushi with a local master chef.",
+    "image": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800"
+  },
+  {
+    "id": "act_5",
+    "city": "Rome",
+    "name": "Colosseum Underground Tour",
+    "type": "history",
+    "cost": 45,
+    "durationMinutes": 180,
+    "description": "Exclusive access to the gladiator dungeons and arena floor.",
+    "image": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800"
+  },
+  {
+    "id": "act_6",
+    "city": "New York",
+    "name": "Broadway Show",
+    "type": "entertainment",
+    "cost": 120,
+    "durationMinutes": 150,
+    "description": "Premium seats for a top-rated musical.",
+    "image": "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800"
+  },
+  {
+    "id": "act_7",
+    "city": "Bali",
+    "name": "Ubud Rice Terraces Trek",
+    "type": "nature",
+    "cost": 15,
+    "durationMinutes": 180,
+    "description": "Guided hike through the lush Tegalalang rice terraces.",
+    "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800"
+  },
+  {
+    "id": "act_8",
+    "city": "Barcelona",
+    "name": "Sagrada Familia Visit",
+    "type": "culture",
+    "cost": 26,
+    "durationMinutes": 120,
+    "description": "Explore Gaudi's unfinished masterpiece.",
+    "image": "https://images.unsplash.com/photo-1583422409516-2895a77ef244?w=800"
+  }
+]
