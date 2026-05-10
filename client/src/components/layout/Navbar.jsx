@@ -7,13 +7,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-background/80 border-b border-border">
-      <div className="flex items-center justify-between px-8 py-4">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground font-[DM_Sans]">
-            {getGreeting()}, <span className="text-primary">{user?.name?.split(' ')[0]}</span> ✈️
-          </h2>
-          <p className="text-sm text-muted-foreground">Let's plan your next adventure</p>
-        </div>
+      <div className="flex items-center justify-end px-8 py-4 w-full">
 
         <div className="flex items-center gap-3">
           <button className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary/50 transition-colors">

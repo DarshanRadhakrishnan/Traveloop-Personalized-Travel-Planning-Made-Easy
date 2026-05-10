@@ -21,6 +21,8 @@ import AdminDashboardPage from '@/pages/AdminDashboardPage';
 
 import { useState } from 'react';
 
+import { useState } from 'react';
+
 function ProtectedLayout() {
   const { user, loading } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
@@ -39,9 +41,12 @@ function ProtectedLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="flex min-h-screen bg-background font-body">
+    <div className="min-h-screen bg-[#FFF8F0] flex">
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <main className="flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300">
+      <main 
+        className="flex-1 min-h-screen transition-all duration-300"
+        style={{ marginLeft: collapsed ? '80px' : '256px' }}
+      >
         <Navbar />
         <div className="flex-1 overflow-x-hidden">
           <Outlet />

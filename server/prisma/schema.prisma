@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -78,6 +79,8 @@ model BudgetItem {
 }
 
 model ChecklistItem {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  tripId   String  @db.ObjectId
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   tripId   String  @db.ObjectId
   itemName String
